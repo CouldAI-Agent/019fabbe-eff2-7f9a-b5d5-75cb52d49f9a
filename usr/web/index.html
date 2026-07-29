@@ -1,38 +1,355 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Cartoon Pastry & Dessert Shop</title>
+    <style>
+        :root {
+            --bg-color: #FFE2E2;
+            --container-bg: #FFEED6;
+            --text-color: #827148;
+            --peach: #E8A07C;
+            --lavender: #C5B3D3;
+            --sage: #A5AF79;
+            --card-bg: #FBEFEF;
+            --card-border: #F5CBCB;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Comic Sans MS', 'Fredoka One', cursive, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #FFF;
+        }
+        .score-board {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: var(--container-bg);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 3px solid var(--text-color);
+            box-shadow: 0 4px 0 var(--text-color);
+        }
+        .game-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .queue, .kitchen {
+            background-color: var(--container-bg);
+            border: 4px solid var(--text-color);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 6px 0 var(--text-color);
+            flex: 1;
+            min-width: 300px;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px dashed var(--text-color);
+            padding-bottom: 10px;
+        }
+        .customer-card {
+            background-color: var(--card-bg);
+            border: 4px solid var(--card-border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .customer-card:active {
+            transform: translateY(2px);
+        }
+        .patience-bar-container {
+            height: 15px;
+            background: #fff;
+            border: 2px solid var(--text-color);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .patience-bar {
+            height: 100%;
+            background: var(--sage);
+            width: 100%;
+            transition: width 1s linear, background-color 0.3s;
+        }
+        .order-layers {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 2px;
+        }
+        .layer {
+            height: 20px;
+            width: 80%;
+            border-radius: 10px;
+            border: 2px solid var(--text-color);
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+        }
+        /* Ingredients Colors */
+        .ing-sponge { background-color: #F4D03F; }
+        .ing-choco { background-color: #6E2C00; }
+        .ing-matcha { background-color: var(--sage); }
+        .ing-cream { background-color: #FFF; color: var(--text-color); text-shadow: none; border-style: dashed; }
+        .ing-berries { background-color: #E74C3C; }
+        .ing-ganache { background-color: #3E2723; }
+        .ing-macaron { background-color: var(--lavender); }
+        .ing-cherry { background-color: #C0392B; border-radius: 50%; width: 20px; }
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="couldai_user_app">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>couldai_user_app</title>
-  <link rel="manifest" href="manifest.json">
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-ing {
+            background-color: var(--peach);
+            border: 3px solid var(--text-color);
+            border-radius: 15px;
+            padding: 10px;
+            font-family: inherit;
+            font-weight: bold;
+            color: var(--text-color);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-color);
+            transition: all 0.1s;
+        }
+        .btn-ing:active {
+            box-shadow: 0 0 0 var(--text-color);
+            transform: translateY(4px);
+        }
+        .btn-ing.ing-macaron { background-color: var(--lavender); }
+        .btn-ing.ing-matcha { background-color: var(--sage); }
+        .btn-ing.ing-cream { background-color: #FFF; }
+        .btn-ing.ing-choco { background-color: #D35400; color: #FFF; text-shadow: 1px 1px 0 #000; }
+        .btn-ing.ing-ganache { background-color: #8D6E63; color: #FFF; text-shadow: 1px 1px 0 #000; }
+        .btn-ing.ing-berries { background-color: #F5B7B1; }
+        
+        .build-area {
+            min-height: 150px;
+            background: #fff;
+            border: 3px dashed var(--text-color);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            padding: 10px;
+            gap: 2px;
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-action {
+            background-color: var(--text-color);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #3e3623;
+        }
+        .btn-action:active {
+            box-shadow: 0 0 0 #3e3623;
+            transform: translateY(4px);
+        }
+    </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+    <h1>🍰 Cute Pastry Shop 🧁</h1>
+    <div class="score-board">Score: <span id="score">0</span></div>
+    
+    <div class="game-container">
+        <!-- Customer Queue -->
+        <div class="queue">
+            <h2>Customer Queue</h2>
+            <div id="customers"></div>
+        </div>
+
+        <!-- Kitchen / Build Area -->
+        <div class="kitchen">
+            <h2>Kitchen</h2>
+            <div class="build-area" id="build-area"></div>
+            
+            <div class="controls">
+                <button class="btn-action" onclick="trashCake()">🗑️ Trash Cake</button>
+            </div>
+
+            <div class="ingredients-grid">
+                <button class="btn-ing" onclick="addLayer('Sponge')">Sponge</button>
+                <button class="btn-ing ing-choco" onclick="addLayer('Choco Base')">Choco Base</button>
+                <button class="btn-ing ing-matcha" onclick="addLayer('Matcha')">Matcha</button>
+                <button class="btn-ing ing-cream" onclick="addLayer('Cream')">Cream</button>
+                <button class="btn-ing ing-berries" onclick="addLayer('Berries')">Berries</button>
+                <button class="btn-ing ing-ganache" onclick="addLayer('Ganache')">Ganache</button>
+                <button class="btn-ing ing-macaron" onclick="addLayer('Macaron')">Macaron</button>
+                <button class="btn-ing" onclick="addLayer('Cherry')">Cherry</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ingredients = ['Sponge', 'Choco Base', 'Matcha', 'Cream', 'Berries', 'Ganache', 'Macaron', 'Cherry'];
+        const classMap = {
+            'Sponge': 'ing-sponge',
+            'Choco Base': 'ing-choco',
+            'Matcha': 'ing-matcha',
+            'Cream': 'ing-cream',
+            'Berries': 'ing-berries',
+            'Ganache': 'ing-ganache',
+            'Macaron': 'ing-macaron',
+            'Cherry': 'ing-cherry'
+        };
+        
+        let score = 0;
+        let currentCake = [];
+        let customers = [];
+        let customerIdCounter = 0;
+
+        function addLayer(ing) {
+            if (currentCake.length >= 6) return;
+            currentCake.push(ing);
+            renderBuildArea();
+        }
+
+        function trashCake() {
+            currentCake = [];
+            renderBuildArea();
+        }
+
+        function renderBuildArea() {
+            const area = document.getElementById('build-area');
+            area.innerHTML = '';
+            currentCake.forEach(ing => {
+                const div = document.createElement('div');
+                div.className = `layer ${classMap[ing]}`;
+                div.textContent = ing === 'Cherry' ? '🍒' : ing;
+                area.appendChild(div);
+            });
+        }
+
+        function spawnCustomer() {
+            if (customers.length >= 4) return;
+            
+            const layersCount = Math.floor(Math.random() * 3) + 2;
+            const order = [];
+            for(let i=0; i<layersCount; i++) {
+                order.push(ingredients[Math.floor(Math.random() * ingredients.length)]);
+            }
+
+            const customer = {
+                id: customerIdCounter++,
+                order: order,
+                patience: 100,
+                maxPatience: 100
+            };
+            
+            customers.push(customer);
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            const container = document.getElementById('customers');
+            container.innerHTML = '';
+            
+            customers.forEach(cust => {
+                const card = document.createElement('div');
+                card.className = 'customer-card';
+                card.onclick = () => serveCustomer(cust.id);
+                
+                const pBarCont = document.createElement('div');
+                pBarCont.className = 'patience-bar-container';
+                const pBar = document.createElement('div');
+                pBar.className = 'patience-bar';
+                pBar.style.width = `${cust.patience}%`;
+                
+                if (cust.patience < 30) pBar.style.backgroundColor = '#E74C3C';
+                else if (cust.patience < 60) pBar.style.backgroundColor = '#F4D03F';
+
+                pBarCont.appendChild(pBar);
+                card.appendChild(pBarCont);
+
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-layers';
+                cust.order.forEach(ing => {
+                    const layer = document.createElement('div');
+                    layer.className = `layer ${classMap[ing]}`;
+                    layer.textContent = ing === 'Cherry' ? '🍒' : ing;
+                    orderDiv.appendChild(layer);
+                });
+                
+                card.appendChild(orderDiv);
+                container.appendChild(card);
+            });
+        }
+
+        function serveCustomer(id) {
+            const custIndex = customers.findIndex(c => c.id === id);
+            if (custIndex === -1) return;
+            
+            const cust = customers[custIndex];
+            
+            // Check if currentCake matches order
+            if (currentCake.length === cust.order.length && currentCake.every((val, index) => val === cust.order[index])) {
+                score += cust.order.length * 10;
+                document.getElementById('score').textContent = score;
+                customers.splice(custIndex, 1);
+                trashCake();
+                renderCustomers();
+            } else {
+                // Wrong order penalty
+                cust.patience = Math.max(0, cust.patience - 20);
+                renderCustomers();
+            }
+        }
+
+        function gameLoop() {
+            // Decrease patience
+            customers.forEach(cust => {
+                cust.patience -= 2; 
+            });
+            
+            // Remove angry customers
+            customers = customers.filter(c => c.patience > 0);
+            
+            // Randomly spawn
+            if (Math.random() < 0.3 && customers.length < 4) {
+                spawnCustomer();
+            }
+            
+            renderCustomers();
+        }
+
+        setInterval(gameLoop, 1000);
+        spawnCustomer();
+        spawnCustomer();
+    </script>
 </body>
 </html>
